@@ -1,1 +1,7 @@
 *draft*
+*key.json
+*key.yaml
+*secret*
+**/terraform.tfstate*
+**/.terraform*
+*.tfvars
