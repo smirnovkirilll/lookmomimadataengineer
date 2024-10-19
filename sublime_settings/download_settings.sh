@@ -1,12 +1,14 @@
 #!/usr/bin/env sh
 # warning: script should be used after installing package control
 # (otherwise it will not install other packages defined in "Package Control.sublime-settings")
+# way to execute:
+# curl -O - https://raw.githubusercontent.com/smirnovkirilll/lookmomimadataengineer/main/sublime_settings/download_settings.sh | sh
 
 
-dir_src="https://raw.githubusercontent.com/smirnovkirilll/lookmomimadataengineer/main/sublime_settings/"
-dir_tgt_osx="${HOME}/Library/Application\ Support/Sublime\ Text/Packages/User/"
-dir_tgt_linux="${HOME}/.config/sublime-text/Packages/User/"
-settings_to_copy=(
+DIR_SRC="https://raw.githubusercontent.com/smirnovkirilll/lookmomimadataengineer/main/sublime_settings/"
+DIR_TGT_OSX="${HOME}/Library/Application\ Support/Sublime\ Text/Packages/User/"
+DIR_TGT_LINUX="${HOME}/.config/sublime-text/Packages/User/"
+SETTINGS_TO_COPY=(
   "Anaconda.sublime-settings"
   "Default (Linux).sublime-mousemap"
   "Default (OSX).sublime-mousemap"
@@ -16,14 +18,19 @@ settings_to_copy=(
   "Preferences.sublime-settings" )
 
 # 1. choose target dir
-if [[ ! -d $dir_tgt_osx ]]; then
-  dir_tgt=$dir_tgt_linux
+# shellcheck disable=sc3010
+if [[ -d $DIR_TGT_OSX ]]; then
+  dir_tgt=$DIR_TGT_OSX
+else
+  dir_tgt=DIR_TGT_LINUX
 fi
 
 # 2. download
-for setting in "${settings_to_copy[@]}"; do
+# shellcheck disable=sc3054
+for setting in "${SETTINGS_TO_COPY[@]}"; do
   # download (convert spaces to "%20" in urls)
-  curl "${dir_src}${setting// /%20}" -o "${dir_tgt}${setting}"
+  # shellcheck disable=sc3060
+  curl "${DIR_SRC}${setting// /%20}" -o "${dir_tgt}${setting}"
 done
 
 echo "sublime settings downloaded to system specific config directory"
