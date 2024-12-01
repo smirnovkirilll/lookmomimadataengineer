@@ -1,4 +1,5 @@
 #!/bin/env -S terraform plan
+# https://developer.hashicorp.com/terraform/tutorials/configuration-language/sensitive-variables
 
 
 terraform {
