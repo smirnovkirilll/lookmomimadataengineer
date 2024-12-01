@@ -45,12 +45,16 @@ resource "yandex_lockbox_secret_version_hashed" "version_0" {
 }
 
 
-resource "random_uuid" "new_on_every_run" {}
+resource "random_uuid" "new_on_every_run" {
+  keepers = {
+    uuid = uuid()
+  }
+}
 
 
-resource "null_resource" "reddit_digest_zip" {
-  triggers = {
-    uuid = random_uuid.new_on_every_run.id
+resource "terraform_data" "reddit_digest_zip" {
+  triggers_replace = {
+    uuid = random_uuid.new_on_every_run.keepers.uuid
   }
   provisioner "local-exec" {
     command = "mkdir app; cp ../{requirements.txt,__init__.py,helpers.py,reddit_request.py,main.py} app; zip -r reddit_digest app; rm -rf app;"
@@ -62,7 +66,7 @@ resource "null_resource" "reddit_digest_zip" {
 resource "yandex_function" "reddit_digest_ingest_raw" {
   name               = "reddit-digest-ingest-raw"
   description        = "requests some subreddits on reddit, saves response to s3"
-  user_hash          = random_uuid.new_on_every_run.id
+  user_hash          = random_uuid.new_on_every_run.keepers.uuid
   runtime            = "python312"
   entrypoint         = "app.main.handler"
   memory             = "128"
@@ -76,7 +80,7 @@ resource "yandex_function" "reddit_digest_ingest_raw" {
     REGION_NAME = var.region_name
     SUBREDDIT_LIST = var.subreddit_list
   }
-  depends_on = [null_resource.reddit_digest_zip]
+  depends_on = [terraform_data.reddit_digest_zip]
   content {
     zip_filename = "reddit_digest.zip"
   }
@@ -100,5 +104,5 @@ resource "yandex_function_trigger" "reddit_digest_ingest_raw_trigger" {
 output yandex_storage_bucket_id {value = yandex_storage_bucket.bucket.id}
 output yandex_lockbox_secret_id {value = yandex_lockbox_secret.reddit_digest.id}
 output reddit_digest_ingest_raw_id {value = yandex_function.reddit_digest_ingest_raw.id}
-output reddit_digest_ingest_raw_user_hash {value = random_uuid.new_on_every_run.id}
+output reddit_digest_ingest_raw_user_hash {value = random_uuid.new_on_every_run.keepers.uuid}
 output yandex_function_trigger_id {value = yandex_function_trigger.reddit_digest_ingest_raw_trigger.id}
