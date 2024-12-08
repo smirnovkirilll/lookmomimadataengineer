@@ -1,8 +1,4 @@
-#!/bin/env -S terraform plan
 # https://developer.hashicorp.com/terraform/tutorials/configuration-language/sensitive-variables
-# terraform init
-# terraform plan -var-file="secret.tfvars"
-# terraform apply -var-file="secret.tfvars"
 
 
 terraform {
