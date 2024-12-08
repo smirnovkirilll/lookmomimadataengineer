@@ -57,18 +57,17 @@ resource "terraform_data" "reddit_digest_zip" {
     uuid = random_uuid.new_on_every_run.keepers.uuid
   }
   provisioner "local-exec" {
-    command = "mkdir app; cp ../{requirements.txt,__init__.py,helpers.py,reddit_request.py,main.py} app; zip -r reddit_digest app; rm -rf app;"
+    command = "cd ..; zip -FSr reddit_digest {requirements.txt,__init__.py,helpers.py,reddit_request.py,main.py}; mv reddit_digest.zip terraform/"
   }
 }
 
 
-# todo: does not work properly yet
 resource "yandex_function" "reddit_digest_ingest_raw" {
   name               = "reddit-digest-ingest-raw"
   description        = "requests some subreddits on reddit, saves response to s3"
   user_hash          = random_uuid.new_on_every_run.keepers.uuid
   runtime            = "python312"
-  entrypoint         = "app.main.handler"
+  entrypoint         = "main.handler"
   memory             = "128"
   execution_timeout  = "10"
   service_account_id = var.service_account_id
