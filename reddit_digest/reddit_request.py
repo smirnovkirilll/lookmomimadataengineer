@@ -14,7 +14,7 @@ import requests
 import requests.auth
 import time
 from datetime import datetime
-from .helpers import upload_object_to_s3
+from helpers import upload_object_to_s3
 
 
 SUBREDDIT = 'dataengineering'
@@ -52,8 +52,10 @@ def get_reddit_response_no_auth(
     else:
         pass
 
+    request = requests.get(base_url, headers={'User-agent': 'my-script'})
+    if request.status_code != 200:
+        raise Exception(f'An error occured: status_code={request.status_code}, reason={request.reason}')
     try:
-        request = requests.get(base_url, headers={'User-agent': 'my-script'})
         response = request.json()
         response['_subreddit'] = subreddit
         response['_request_start_time'] = start
