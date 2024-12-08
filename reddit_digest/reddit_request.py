@@ -54,6 +54,8 @@ def get_reddit_response_no_auth(
 
     request = requests.get(base_url, headers={'User-agent': 'my-script'})
     if request.status_code != 200:
+        logger.error(f'An error occ: status_code={request.status_code}, reason={request.reason}')
+        # note: not raises in runtime, have not found out reason yet
         raise Exception(f'An error occured: status_code={request.status_code}, reason={request.reason}')
     try:
         response = request.json()
