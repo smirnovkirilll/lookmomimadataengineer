@@ -277,4 +277,4 @@ Hello everyone! My name is Kirill, [I'm a data engineer](https://www.linkedin.co
 
 &nbsp;
 ## Contact me
-I do already have a permanent job, but if you found my experience interesting, I'm open to a dialogue on specific projects, you can find me on [Linkedin](https://www.linkedin.com/in/smirnovkirilll). At the very least, perhaps I could recommend another DWH specialist I have worked with who might be able to help you.
+I do already have a permanent job, but if you believe I can help with your project, feel free to contact me on [Linkedin](https://www.linkedin.com/in/smirnovkirilll). At the very least, perhaps I could recommend another DWH specialist I have worked with and who might be able to help you.
