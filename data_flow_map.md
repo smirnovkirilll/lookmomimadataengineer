@@ -9,11 +9,11 @@ title:
 ---
 flowchart LR;
 S1((reddit)) --> |serverless func-1| DB[(postgresql)]
-S2((some text\n source)) --> |save to pocket| S3((pocket)) --> |serverless func-2| DB[(postgresql)]
-S4((youtube)) --> |save to playlist| S5((youtube\nplaylist)) --> |serverless func-3| DB[(postgresql)]
+S2((some text source)) --> |save to pocket| S3((pocket)) --> |serverless func-2| DB[(postgresql)]
+S4((youtube)) --> |save to playlist| S5((youtube playlist)) --> |serverless func-3| DB[(postgresql)]
 DB[(postgresql)] --> |local actions*| DB[(postgresql)]
 DB[(postgresql)] --> |serverless func-4| T1[reddit digest]
-DB[(postgresql)] --> |local script-1*| T2[public readme list\non Data Engineering]
+DB[(postgresql)] --> |local script-1*| T2[public readme list on DE]
 DB[(postgresql)] --> |local script-2*| T3[private readme list]
 
 click T1 "https://github.com/smirnovkirilll/lookmomimadataengineer/tree/main/reddit_digest" "reddit digest"
