@@ -155,7 +155,7 @@ Hello everyone! My name is Kirill, [I'm a data engineer](https://www.linkedin.co
 - [YTsaurus](https://ytsaurus.tech/docs/en/)
   - https://www.youtube.com/@ytsaurus
   - [YTsaurus - это будущее DWH, и в Яндекс Маркете оно наступило / Филипп Козьмин (Яндекс Маркет) - YouTube](https://www.youtube.com/watch?v=y1Jqm8ObcZ4)
- - [Clickhouse](https://clickhouse.com/docs)
+- [Clickhouse](https://clickhouse.com/docs)
   - [Managed Service for ClickHouse - Practicum](https://yandex.cloud/ru/training/clickhouse)
   - [004. ClickHouse как сделать самую быструю распределённую аналитическую СУБД - Виктор Тарнавский - YouTube](https://www.youtube.com/watch?v=Ho4_dQk7dAg)
   - [005. Как работает ClickHouse, лекция в ШАД - YouTube](https://www.youtube.com/watch?v=vbhSrZxm66E)
