@@ -3,6 +3,7 @@
 __pycache__
 reddit_digest.zip
 *draft*
+*.html
 *key.json
 *key.yaml
 *secret*
