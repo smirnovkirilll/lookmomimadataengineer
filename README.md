@@ -44,13 +44,13 @@ Hello everyone! My name is Kirill, [I'm a data engineer](https://www.linkedin.co
 - [Designing Data-Intensive Applications (Martin Kleppmann)](https://www.amazon.com/Designing-Data-Intensive-Applications-Reliable-Maintainable/dp/1449373321)
 - [Методы и системы обработки больших данных (Иван Пузыревский)](https://www.youtube.com/playlist?list=PL-_cKNuVAYAVJJRItmIfqft4HtAmaNgB4)
 - one also should [understand expectations](https://gopractice.ru/skills/data_analysts_levels) for engineers of different grades (article is about analysts, but it's so good and can easily be projected on engineers, so I can strongly recommend it)
-<details>
-  <summary>little bit more on levels</summary>
-- [brief review](https://www.levels.fyi/blog/swe-level-framework.html) on software engineer levels (by levels.fyi)
-- [unnecessarily detailed](https://github.com/avito-tech/playbook/blob/master/developer-profile.md) set of developers profiles. as for me, this is more corporate nonsense than helping someone progress. but if ignore that part on performance review, it still could be useful for self-development (by avito)
-</details>
+  - little bit more on levels:
+    - [brief review](https://www.levels.fyi/blog/swe-level-framework.html) on software engineer levels (by levels.fyi)
+    - [unnecessarily detailed](https://github.com/avito-tech/playbook/blob/master/developer-profile.md) set of developers profiles. as for me, this is more corporate nonsense than helping someone progress. but if ignore that part on performance review, it still could be useful for self-development (by avito)
+
 **everything you will find later in this post is much more specific and much less fundamental**, so this is a basics. if you don't see why chapter of Kleppmann's book dedicated to partitioning is pretty controversial, maybe you have read it too early (hint: partitioning vs distribution).
 
+> [!NOTE]
 > you can find more information on concepts and tools of Data Engineering on [wiki article](https://dataengineering.wiki/Tools/Tools), written and curated by Reddit enthusiasts ([DE subreddit & community](https://www.reddit.com/r/dataengineering/)) or [data engineer handbook by Zach Wilson](https://github.com/DataExpert-io/data-engineer-handbook).
 
 
@@ -180,6 +180,7 @@ Hello everyone! My name is Kirill, [I'm a data engineer](https://www.linkedin.co
 
 &nbsp;
 ### Reverse ETL
+> [!NOTE]
 > IMHO, it's a pretty strange idea to have a separate tool to do the same thing as the ingest applications, but in the opposite direction. seems that it would be pretty straightforward if one of the competitors (Airbyte, Fivetran, whoever) will fill this gap if it really exists
 
 - Census
@@ -229,9 +230,8 @@ Hello everyone! My name is Kirill, [I'm a data engineer](https://www.linkedin.co
 &nbsp;
 ### Orchestration
 - [Airflow](https://airflow.apache.org/docs/) TBD
-- [Prefect](https://docs.prefect.io)
+- [Prefect](https://docs.prefect.io) (seems it fits better for Data Analysts, not gonna use it)
   - [Юлия Волкова - Любовь и ненависть к Prefect 2.0 после Apache Airflow - YouTube](https://www.youtube.com/watch?v=L16MkFWoRk4)
-  - :exclamation: seems it fits better for Data Analysts, not gonna use it
 
 
 &nbsp;
