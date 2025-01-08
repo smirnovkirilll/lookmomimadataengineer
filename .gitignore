@@ -1,9 +1,12 @@
 .idea
 .DS_Store
 __pycache__
+ag-grid-community.min.js
+data_flow_map.html
+README.html
 reddit_digest.zip
+website/data
 *draft*
-*.html
 *key.json
 *key.yaml
 *secret*
