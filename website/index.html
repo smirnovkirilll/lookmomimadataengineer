@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+<title>HTML Tutorial</title>
+    <!-- AG-GRID -->
+    <link rel="stylesheet" href="common/additional.css"/>
+    <script type="text/javascript" src="common/ag-grid-community.min.js"></script>
+    <script type="text/javascript" src="common/tabs.js"></script>
+</head>
+<body class="body">
+
+
+<!--DYNAMIC PART BEGIN-->
+<div class="tab">
+    <button class="tablinks" onclick="openList(event, 'curated-list-tab')" id="defaultOpen">Curated List</button>
+    <button class="tablinks" onclick="openList(event, 'reddit-digest-tab')">Reddit Digest</button>
+</div>
+
+
+<div id="curated-list-tab" class="tabcontent">
+<h2>Curated read and watch list on Data Landscape (ETL-tools, concepts, etc)
+    <a href="https://github.com/smirnovkirilll/lookmomimadataengineer/README.md"> (what is it?)</a>
+</h2>
+<div>
+    <input type="text" id="curated-list-filter" class="ag-grid-quick-filter" placeholder="Filter..." oninput="onFilterTextBoxChangedCL()" />
+</div>
+<div id="CuratedListGrid" class="ag-grid"></div>
+<script type="text/javascript" src="pages/curated-list.js"></script>
+</div>
+
+
+<div id="reddit-digest-tab" class="tabcontent">
+<h2>Auto-updated read list on DE subreddits of Reddit
+    <a href="https://github.com/smirnovkirilll/lookmomimadataengineer/reddit_digest"> (what is it?)</a>
+</h2>
+<div>
+    <input type="text" id="reddit-digest-filter" class="ag-grid-quick-filter" placeholder="Filter..." oninput="onFilterTextBoxChangedRD()" />
+</div>
+<div id="RedditDigestGrid" class="ag-grid"></div>
+<script type="text/javascript" src="pages/reddit-digest.js"></script>
+</div>
+<!--DYNAMIC PART END-->
+
+
+<script type="text/javascript">
+    document.getElementById("defaultOpen").click();
+</script>
+
+
+<div class="footer">
+    <a href="https://github.com/smirnovkirilll/lookmomimadataengineer">
+    <img src="common/github.png" alt="github" class="footer-img">
+    </a>
+</div>
+
+
+</body>
+</html>
