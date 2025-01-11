@@ -26,7 +26,7 @@ jobs:
           --exclude website/app \
           --exclude website/data \
           --delete; \
-        curl ${{ env.AG_GRID_CDN_URL }} | aws s3 cp - s3://${{ secrets.AWS_S3_BUCKET }}${{ AG_GRID_TARGET_PATH }} \
+        curl ${{ env.AG_GRID_CDN_URL }} | aws s3 cp - s3://${{ secrets.AWS_S3_BUCKET }}${{ env.AG_GRID_TARGET_PATH }} \
           --endpoint-url ${{ secrets.AWS_ENDPOINT_URL }} \
           --region ${{ secrets.AWS_REGION_NAME }}; \
         unset AWS_ACCESS_KEY_ID;
