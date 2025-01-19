@@ -4,8 +4,8 @@ __pycache__
 ag-grid-community.min.js
 data_flow_map.html
 README.html
-reddit_digest.zip
 website/data
+terraform/state_and_vars/
 *draft*
 *key.json
 *key.yaml
