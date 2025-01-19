@@ -1,6 +1,11 @@
 # https://developer.hashicorp.com/terraform/tutorials/configuration-language/sensitive-variables
 
 
+variable "revision" {
+  default = 2
+}
+
+
 terraform {
   required_providers {
     yandex = {
@@ -8,6 +13,12 @@ terraform {
     }
   }
   required_version = ">= 0.13"
+  backend "s3" {
+    skip_region_validation      = true
+    skip_credentials_validation = true
+    skip_requesting_account_id  = true  # option needed for Terraform version >= 1.6.1
+    skip_s3_checksum            = true  # option needed for Terraform version >= 1.6.1
+  }
 }
 
 
@@ -41,19 +52,12 @@ resource "yandex_lockbox_secret_version_hashed" "version_0" {
 }
 
 
-resource "random_uuid" "new_on_every_run" {
-  keepers = {
-    uuid = uuid()
-  }
-}
-
-
 resource "terraform_data" "reddit_digest_zip" {
   triggers_replace = {
-    uuid = random_uuid.new_on_every_run.keepers.uuid
+    revision = var.revision
   }
   provisioner "local-exec" {
-    command = "cd ..; zip -FSr reddit_digest {requirements.txt,__init__.py,helpers.py,reddit_request.py,main.py}; mv reddit_digest.zip terraform/"
+    command = "cd ../website/app/reddit_digest; zip -FSr reddit_digest {requirements.txt,__init__.py,helpers.py,reddit_request.py,main.py}; mv reddit_digest.zip ../../../terraform/state_and_vars"
   }
 }
 
@@ -61,11 +65,11 @@ resource "terraform_data" "reddit_digest_zip" {
 resource "yandex_function" "reddit_digest_ingest_raw" {
   name               = "reddit-digest-ingest-raw"
   description        = "requests some subreddits on reddit, saves response to s3"
-  user_hash          = random_uuid.new_on_every_run.keepers.uuid
+  user_hash          = var.revision
   runtime            = "python312"
   entrypoint         = "main.handler"
-  memory             = "128"
-  execution_timeout  = "10"
+  memory             = "256"
+  execution_timeout  = "30"
   service_account_id = var.service_account_id
   tags               = ["reddit_digest"]
   environment = {
@@ -77,7 +81,7 @@ resource "yandex_function" "reddit_digest_ingest_raw" {
   }
   depends_on = [terraform_data.reddit_digest_zip]
   content {
-    zip_filename = "reddit_digest.zip"
+    zip_filename = "state_and_vars/reddit_digest.zip"
   }
 }
 
@@ -96,8 +100,8 @@ resource "yandex_function_trigger" "reddit_digest_ingest_raw_trigger" {
 }
 
 
+output revision {value = var.revision}
 output yandex_storage_bucket_id {value = yandex_storage_bucket.bucket.id}
 output yandex_lockbox_secret_id {value = yandex_lockbox_secret.reddit_digest.id}
 output reddit_digest_ingest_raw_id {value = yandex_function.reddit_digest_ingest_raw.id}
-output reddit_digest_ingest_raw_user_hash {value = random_uuid.new_on_every_run.keepers.uuid}
 output yandex_function_trigger_id {value = yandex_function_trigger.reddit_digest_ingest_raw_trigger.id}

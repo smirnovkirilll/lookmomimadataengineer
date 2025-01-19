@@ -1,6 +1,6 @@
 tf-init:
-	terraform init
+	terraform init -backend-config="state_and_vars/backend.conf"
 tf-plan:
-	terraform plan -var-file="secret.tfvars"
+	terraform plan -var-file="state_and_vars/secret.tfvars"
 tf-apply:
-	terraform apply -var-file="secret.tfvars"
+	terraform apply -var-file="state_and_vars/secret.tfvars"
