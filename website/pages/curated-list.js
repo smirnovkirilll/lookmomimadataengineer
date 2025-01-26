@@ -1,20 +1,24 @@
 let gridApiCL;
 const gridOptionsCL = {
   rowData: [],
+  autoSizeStrategy: {
+    type: 'fitCellContents'
+  },
   columnDefs: [
-    { field: "mission" },
+    { field: "topic" },
+    { field: "type of content" },
+    { field: "language" },
     {
-        headerName: "save to pocket",
-        field: "mission",
-        cellRenderer: CellLinkRenderer,
-        cellStyle: {textAlign: 'center'}
+      field: "name",
+      cellRenderer: NameCellLinkRendererCL,
+      maxWidth: 700,
     },
-    { field: "company" },
-    { field: "location" },
-    { field: "date" },
-    { field: "price" },
-    { field: "successful" },
-    { field: "rocket" },
+    {
+      headerName: "Save To Pocket",
+      field: "url",
+      cellRenderer: PocketCellLinkRendererCL,
+      cellStyle: {textAlign: "center"}
+    },
   ],
   pagination: true,
   defaultColDef: {
@@ -31,16 +35,28 @@ function onFilterTextBoxChangedCL() {
 }
 
 
-function CellLinkRenderer(params) {
-    let keyData = params.value;
-    let newLink = `
-        <a
-            href="https://getpocket.com/edit?url=https://habr.com/ru/articles/871582/"
-//            href="https://getpocket.com/edit?url=${keyData}" TODO
-        >
-        <img src="common/pocket.png" alt="save to pocket" class="pocket-img">
-    </a>`;
-     return newLink;
+function NameCellLinkRendererCL(params) {
+  let name = params.value;
+  let url = params.data.url;
+  let link = `
+    <a
+      href="${url}"
+    >
+    ${name}
+  </a>`;
+  return link;
+}
+
+
+function PocketCellLinkRendererCL(params) {
+  let url = params.value;
+  let link = `
+    <a
+      href="https://getpocket.com/edit?url=${url}"
+    >
+    <img src="common/pocket.png" alt="save to pocket" class="pocket-img">
+  </a>`;
+  return link;
 }
 
 
