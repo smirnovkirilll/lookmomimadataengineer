@@ -18,12 +18,15 @@ jobs:
 
     - name: Sync files to S3
       # direct exclude with globing does not work properly, so using enumeration of subdirs
+      # "when_required" - stupid bug, thanks aws https://github.com/aws/aws-cli/issues/9214
       run: |
         export AWS_ENDPOINT_URL=${{ secrets.AWS_ENDPOINT_URL }};
         export AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }};
         export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }};
         export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }};
-        aws s3 sync website/common s3://${{ secrets.AWS_S3_BUCKET }}/common --delete --debug;
+        export AWS_REQUEST_CHECKSUM_CALCULATION=when_required;
+        export AWS_RESPONSE_CHECKSUM_VALIDATION=when_required;
+        aws s3 sync website/common s3://${{ secrets.AWS_S3_BUCKET }}/common --delete;
         aws s3 sync website/pages s3://${{ secrets.AWS_S3_BUCKET }}/pages --delete;
         aws s3 cp website/index.html s3://${{ secrets.AWS_S3_BUCKET }}/index.html;
         curl ${{ vars.AG_GRID_CDN_URL }} | aws s3 cp - s3://${{ secrets.AWS_S3_BUCKET }}${{ vars.AG_GRID_TARGET_PATH }};
