@@ -51,7 +51,7 @@ Hello everyone! My name is Kirill, [I'm a data engineer](https://www.linkedin.co
 
 
 &nbsp;
-### [list itself](https://lookmomimadataengineer.website.yandexcloud.net/)
+### [list itself](https://lookmomimadataengineer.website.yandexcloud.net/) (UNDER CONSTRUCTION)
 
 
 &nbsp;
