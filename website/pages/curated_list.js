@@ -2,19 +2,19 @@ let gridApiCL;
 const gridOptionsCL = {
   rowData: [],
   autoSizeStrategy: {
-    type: 'fitCellContents'
+    type: "fitCellContents"
   },
   columnDefs: [
     { field: "topic" },
     { field: "type of content" },
     { field: "language" },
     {
-      field: "name",
-      cellRenderer: NameCellLinkRendererCL,
+      field: "title",
+      cellRenderer: TitleCellLinkRendererCL,
       maxWidth: 700,
     },
     {
-      headerName: "Save To Pocket",
+      headerName: "To Pocket",
       field: "url",
       cellRenderer: PocketCellLinkRendererCL,
       cellStyle: {textAlign: "center"}
@@ -35,14 +35,14 @@ function onFilterTextBoxChangedCL() {
 }
 
 
-function NameCellLinkRendererCL(params) {
-  let name = params.value;
+function TitleCellLinkRendererCL(params) {
+  let title = params.value;
   let url = params.data.url;
   let link = `
     <a
       href="${url}"
     >
-    ${name}
+    ${title}
   </a>`;
   return link;
 }
@@ -61,6 +61,6 @@ function PocketCellLinkRendererCL(params) {
 
 
 gridApiCL = agGrid.createGrid(document.querySelector("#CuratedListGrid"), gridOptionsCL);
-fetch("data/curated-list.json")
+fetch("data/curated_list.json")
   .then((response) => response.json())
   .then((data) => gridApiCL.setGridOption("rowData", data));
