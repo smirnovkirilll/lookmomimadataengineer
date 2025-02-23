@@ -14,7 +14,7 @@ import requests
 import requests.auth
 import time
 from datetime import datetime
-from helpers import upload_object_to_s3
+from loader.common.helpers import upload_object_to_s3
 
 
 SUBREDDIT = 'dataengineering'
@@ -164,3 +164,10 @@ def request_and_save_response(
     save_func = upload_dict_to_s3 if s3 else save_dict_locally
 
     return save_func(full_response, compress=compress, hist=hist)
+
+
+if __name__ == '__main__':
+    # note: debug only
+    logging.basicConfig(level=logging.INFO)
+    for subreddit in os.environ['SUBREDDIT_LIST'].split(','):
+        request_and_save_response(subreddit)
