@@ -1,6 +1,6 @@
 #!/bin/env python
 import os
-from reddit_request import request_and_save_response
+from loader.private.raw.reddit import request_and_save_response
 
 
 def handler(event, context):
