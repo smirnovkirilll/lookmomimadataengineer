@@ -12,7 +12,7 @@ from yandex.cloud.lockbox.v1.payload_service_pb2 import GetPayloadRequest
 from yandex.cloud.lockbox.v1.payload_service_pb2_grpc import PayloadServiceStub
 
 
-logger = logging.getLogger('logging cloud actions')
+logger = logging.getLogger('logging helpers')
 logger.setLevel(logging.INFO)
 boto_session = None
 s3_client = None
@@ -223,9 +223,24 @@ def download_object_from_s3(bucket: str, file_name: str) -> BytesIO:
 
     s3_client = get_s3_client()
     logger.info(f'Starting download from S3 file_name={file_name}')
-    s3_client.download_fileobj(bucket, temp_file, file_name)
+    s3_client.download_fileobj(bucket, file_name, temp_file)
 
     return temp_file
+
+
+def read_local_file(file_name: str) -> str:
+
+    with open(file_name) as f:
+        return f.read()
+
+
+def read_temp_file(temp_file: BytesIO) -> str:
+
+    temp_file.seek(0)
+    content = temp_file.read().decode()
+    temp_file.close()
+
+    return content
 
 
 def execute_postgresql_query(query):
