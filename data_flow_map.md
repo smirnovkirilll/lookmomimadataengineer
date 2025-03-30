@@ -9,9 +9,9 @@ title:
 ---
 flowchart LR;
 S1((reddit)) --> |serverless func-1| DB[(postgresql)]
-S2((online text\n source)) --> |save to pocket| S3((pocket)) --> |serverless func-2| DB[(postgresql)]
-S4((youtube)) --> |save to playlist| S5((youtube\n playlist)) --> |serverless func-3| DB[(postgresql)]
-S6((initial\nread/watch\nlist in CSV)) --> |serverless func-4| DB[(postgresql)]
+S2((online text<br>source)) --> |save to pocket| S3((pocket)) --> |serverless func-2| DB[(postgresql)]
+S4((youtube)) --> |save to playlist| S5((youtube<br>playlist)) --> |serverless func-3| DB[(postgresql)]
+S6((initial<br>read/watch<br>list in CSV)) --> |serverless func-4| DB[(postgresql)]
 DB[(postgresql)] --> |local actions*| DB[(postgresql)]
 DB[(postgresql)] --> |serverless func-5| T1[reddit digest on DE]
 DB[(postgresql)] --> |serverless func-6| T2[curated list on DE]
