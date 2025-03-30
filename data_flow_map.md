@@ -9,12 +9,13 @@ title:
 ---
 flowchart LR;
 S1((reddit)) --> |serverless func-1| DB[(postgresql)]
-S2((some text source)) --> |save to pocket| S3((pocket)) --> |serverless func-2| DB[(postgresql)]
-S4((youtube)) --> |save to playlist| S5((youtube playlist)) --> |serverless func-3| DB[(postgresql)]
+S2((online text\n source)) --> |save to pocket| S3((pocket)) --> |serverless func-2| DB[(postgresql)]
+S4((youtube)) --> |save to playlist| S5((youtube\n playlist)) --> |serverless func-3| DB[(postgresql)]
+S6((initial\nread/watch\nlist in CSV)) --> |serverless func-4| DB[(postgresql)]
 DB[(postgresql)] --> |local actions*| DB[(postgresql)]
-DB[(postgresql)] --> |serverless func-4| T1[reddit digest on DE]
-DB[(postgresql)] --> |serverless func-5| T2[curated list on DE]
-DB[(postgresql)] --> |local actions*| T3[other readme lists]
+DB[(postgresql)] --> |serverless func-5| T1[reddit digest on DE]
+DB[(postgresql)] --> |serverless func-6| T2[curated list on DE]
+DB[(postgresql)] --> |local actions*| T3[other read/watch lists]
 
 click T1 "https://lookmomimadataengineer.website.yandexcloud.net" "reddit digest on DE"
 click T2 "https://lookmomimadataengineer.website.yandexcloud.net" "curated list on DE"
