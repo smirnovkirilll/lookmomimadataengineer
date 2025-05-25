@@ -8,17 +8,16 @@ title:
  (TBD, not implemented fully yet)
 ---
 flowchart LR;
-S1((reddit)) --> |serverless func-1| DB[(postgresql)]
-S2((online text<br>source)) --> |save to pocket| S3((pocket)) --> |serverless func-2| DB[(postgresql)]
-S4((youtube)) --> |save to playlist| S5((youtube<br>playlist)) --> |serverless func-3| DB[(postgresql)]
-S6((initial<br>read/watch<br>list in CSV)) --> |serverless func-4| DB[(postgresql)]
-DB[(postgresql)] --> |local actions*| DB[(postgresql)]
-DB[(postgresql)] --> |serverless func-5| T1[reddit digest on DE]
-DB[(postgresql)] --> |serverless func-6| T2[curated list on DE]
-DB[(postgresql)] --> |local actions*| T3[other read/watch lists]
+S1((initial<br>read/watch<br>list)) --> |serverless func-1| DB[(db)]
+S2((online text<br>source)) --> |save to pocket| S3((pocket)) --> |serverless func-2| DB[(db)]
+S4((youtube)) --> |save to playlist| S5((youtube<br>playlist)) --> |serverless func-3| DB[(db)]
+S6((reddit)) --> |serverless func-4| DB[(db)]
+DB[(db)] --> |local actions*| DB[(db)]
+DB[(db)] --> |serverless func-5| T1[pw]
+DB[(db)] --> |serverless func-6| T1[public website:<br>- curated list on DE<br>- reddit digest on DE]
+DB[(database)] --> |local actions*| T3[private read/watch lists]
 
-click T1 "https://lookmomimadataengineer.website.yandexcloud.net" "reddit digest on DE"
-click T2 "https://lookmomimadataengineer.website.yandexcloud.net" "curated list on DE"
+click T1 "https://lookmomimadataengineer.website.yandexcloud.net" "public website"
 ```
 
 
