@@ -5,19 +5,31 @@ const gridOptionsCL = {
     type: "fitCellContents"
   },
   columnDefs: [
-    { field: "topic" },
-    { field: "type of content" },
-    { field: "language" },
-    {
-      field: "title",
-      cellRenderer: TitleCellLinkRendererCL,
-      maxWidth: 700,
-    },
     {
       headerName: "To Pocket",
       field: "url",
       cellRenderer: PocketCellLinkRendererCL,
-      cellStyle: {textAlign: "center"}
+      cellStyle: {textAlign: "center"},
+      maxWidth: 120,
+    },
+    {
+      field: "title",
+      cellRenderer: TitleCellLinkRendererCL,
+      minWidth: 300,
+      maxWidth: 600,
+    },
+    { field: "topic" },
+    { field: "type of content" },
+    { field: "language" },
+    {
+      field: "author",
+      minWidth: 200,
+      maxWidth: 600,
+    },
+    {
+      field: "comment",
+      minWidth: 300,
+      maxWidth: 600,
     },
   ],
   pagination: true,

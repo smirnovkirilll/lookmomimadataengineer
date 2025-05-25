@@ -128,7 +128,7 @@ def get_postgresql_connection():
         connection_data['sslmode'] = os.environ['POSTGRESQL_SSLMODE'],
         connection_data['target_session_attrs'] = os.environ['POSTGRESQL_TARGET_SESSION_ATTRS']
         connection = psycopg2.connect(**connection_data)
-        logger.info(f'Built boto-session for secret_id={secret_id}')
+        logger.info(f'Built boto-session for {secret_id=}')
         return connection
 
     return None
@@ -143,7 +143,7 @@ def get_boto_session():
     aws_secrets = get_aws_secrets()
     secret_id = aws_secrets.pop('secret_id')
     boto_session = boto3.session.Session(**aws_secrets)
-    logger.info(f'Built boto-session for secret_id={secret_id}')
+    logger.info(f'Built boto-session for {secret_id=}')
 
     return boto_session
 
@@ -182,7 +182,7 @@ def get_docapi_table(table_name: str):
         endpoint_url=endpoint_url,
         region_name=region_name,
     ).Table(table_name)
-    logger.info(f'Got YDB-table={table_name}')
+    logger.info(f'Got YDB-{table_name=}')
 
     return docapi_table
 
@@ -213,7 +213,7 @@ def upload_object_to_s3(bucket: str, file_name: str, data_obj: bytes) -> None:
     temp_file.seek(0)
 
     s3_client = get_s3_client()
-    logger.info(f'Starting upload to S3 file_name={file_name}')
+    logger.info(f'Starting upload to S3 {file_name=}')
     s3_client.upload_fileobj(temp_file, bucket, file_name)
 
 
@@ -222,7 +222,7 @@ def download_object_from_s3(bucket: str, file_name: str) -> BytesIO:
     temp_file = BytesIO()
 
     s3_client = get_s3_client()
-    logger.info(f'Starting download from S3 file_name={file_name}')
+    logger.info(f'Starting download from S3 {file_name=}')
     s3_client.download_fileobj(bucket, file_name, temp_file)
 
     return temp_file
@@ -243,12 +243,18 @@ def read_temp_file(temp_file: BytesIO) -> str:
     return content
 
 
+def write_object_to_local_file(file_name: str, data_obj: bytes):
+
+    with open(file_name, 'wb') as f:
+        f.write(data_obj)
+
+
 def execute_postgresql_query(query):
 
     connection = get_postgresql_connection()
     if connection:
         cursor = connection.cursor()
-        logger.info(f'Starting execute query={query}')
+        logger.info(f'Starting execute {query=}')
         cursor.execute(query)
         return cursor.fetchall()
 
