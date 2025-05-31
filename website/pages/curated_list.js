@@ -4,6 +4,8 @@ const gridOptionsCL = {
   autoSizeStrategy: {
     type: "fitCellContents"
   },
+  tooltipShowMode: "whenTruncated",
+  tooltipShowDelay: 1000,
   columnDefs: [
     {
       headerName: "To Pocket",
@@ -17,6 +19,7 @@ const gridOptionsCL = {
       cellRenderer: TitleCellLinkRendererCL,
       minWidth: 300,
       maxWidth: 600,
+      tooltipField: "title",
     },
     { field: "topic" },
     { field: "type of content" },
@@ -30,6 +33,7 @@ const gridOptionsCL = {
       field: "comment",
       minWidth: 300,
       maxWidth: 600,
+      tooltipField: "comment",
     },
   ],
   pagination: true,
