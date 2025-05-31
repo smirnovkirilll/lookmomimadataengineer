@@ -2,7 +2,7 @@
 # note: 3 source and target types required: csv <--> json <--> postgresql <--> csv
 #   entries can be stored locally, s3, postgresql
 #   lets implement generic transfer to move entries in any direction
-import csv
+
 import json
 import os
 import logging
@@ -14,6 +14,7 @@ from loader.common.helpers import (
     download_object_from_s3,
     read_local_file,
     read_temp_file,
+    csv_file_content_to_dict,
     write_object_to_local_file,
     upload_object_to_s3,
     execute_postgresql_query,
@@ -44,7 +45,6 @@ class TableTransfer:
             target_pg_table=None,
     ):
         self.columns = None
-        self.flat_entries = None
         self.list_of_dicts_entries = None
         self.source_s3_bucket = source_s3_bucket
         self.source_file_name = source_file_name
@@ -79,21 +79,7 @@ class TableTransfer:
         else:
             content = read_local_file(self.source_file_name)
 
-        content = content.splitlines()
-        columns = content[0]
-        entries = content[1:]
-        self.columns = [column.strip().strip('\"').strip() for column in columns.split(',')]
-        logger.info(f'Got columns from CSV: {self.columns=}')
-
-        self.flat_entries = [
-            [value.strip().strip('\"').strip() for value in entry.split(',')]
-            for entry in entries if entry
-        ]
-        logger.info(f'Got flat entries from CSV: {self.flat_entries=}')
-
-        self.list_of_dicts_entries = []
-        for entry in self.flat_entries:
-            self.list_of_dicts_entries.append(dict(zip(self.columns, entry)))
+        self.list_of_dicts_entries = csv_file_content_to_dict(content)
         logger.info(f'Got entries as dicts from CSV: {self.list_of_dicts_entries=}')
 
     @property
