@@ -17,7 +17,7 @@ const gridOptionsCL = {
     {
       field: "title",
       cellRenderer: TitleCellLinkRendererCL,
-      minWidth: 300,
+      minWidth: 500,
       maxWidth: 600,
       tooltipField: "title",
     },

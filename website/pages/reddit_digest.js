@@ -1,7 +1,23 @@
 let gridApiRD;
 const gridOptionsRD = {
   rowData: [],
+  tooltipShowMode: "whenTruncated",
+  tooltipShowDelay: 1000,
   columnDefs: [
+    {
+      headerName: "To pocket",
+      field: "external_url",
+      cellRenderer: PocketCellLinkRendererRD,
+      cellStyle: {textAlign: "center"},
+      maxWidth: 120,
+    },
+    {
+      field: "title",
+      cellRenderer: TitleCellLinkRendererRD,
+      minWidth: 500,
+      maxWidth: 600,
+      tooltipField: "title",
+    },
     {
       field: "subreddit",
       maxWidth: 150,
@@ -14,19 +30,6 @@ const gridOptionsRD = {
       field: "author",
       maxWidth: 150,
       },
-    {
-      field: "title",
-      cellRenderer: TitleCellLinkRendererRD,
-      minWidth: 500,
-      maxWidth: 700,
-    },
-    {
-      headerName: "To pocket",
-      field: "external_url",
-      cellRenderer: PocketCellLinkRendererRD,
-      cellStyle: {textAlign: "center"},
-      maxWidth: 120,
-    },
     {
       field: "comments",
       cellStyle: {textAlign: "center"},
