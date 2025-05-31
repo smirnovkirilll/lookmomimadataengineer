@@ -3,6 +3,7 @@
 # note: do not import to main, use only for specific loaders
 
 import boto3
+import csv
 import logging
 import os
 import psycopg2
@@ -241,6 +242,11 @@ def read_temp_file(temp_file: BytesIO) -> str:
     temp_file.close()
 
     return content
+
+
+def csv_file_content_to_dict(file_content: str) -> list[dict[str: str]]:
+
+    return [row for row in csv.DictReader(file_content.splitlines())]
 
 
 def write_object_to_local_file(file_name: str, data_obj: bytes):
