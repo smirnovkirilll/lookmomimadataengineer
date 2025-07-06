@@ -8,13 +8,6 @@ const gridOptionsCL = {
   tooltipShowDelay: 1000,
   columnDefs: [
     {
-      headerName: "To Pocket",
-      field: "url",
-      cellRenderer: PocketCellLinkRendererCL,
-      cellStyle: {textAlign: "center"},
-      maxWidth: 120,
-    },
-    {
       field: "title",
       cellRenderer: TitleCellLinkRendererCL,
       minWidth: 500,
@@ -59,18 +52,6 @@ function TitleCellLinkRendererCL(params) {
       href="${url}"
     >
     ${title}
-  </a>`;
-  return link;
-}
-
-
-function PocketCellLinkRendererCL(params) {
-  let url = params.value;
-  let link = `
-    <a
-      href="https://getpocket.com/edit?url=${url}"
-    >
-    <img src="common/pocket.png" alt="save to pocket" class="pocket-img">
   </a>`;
   return link;
 }
