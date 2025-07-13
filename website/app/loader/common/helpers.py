@@ -7,8 +7,16 @@ import csv
 import logging
 import os
 import psycopg2
+import requests
+import typing as tp
 import yandexcloud
+from bs4 import BeautifulSoup
+from datetime import datetime
 from io import BytesIO
+from requests import Session
+from requests.adapters import HTTPAdapter
+from urllib.parse import urlparse
+from urllib3.util.retry import Retry
 from yandex.cloud.lockbox.v1.payload_service_pb2 import GetPayloadRequest
 from yandex.cloud.lockbox.v1.payload_service_pb2_grpc import PayloadServiceStub
 
@@ -19,6 +27,36 @@ boto_session = None
 s3_client = None
 docapi_table = None
 ymq_queue = None
+DTTM_FORMAT = '%Y-%m-%d %H:%M:%S'
+# some authors do not want me to know titles of their articles, will not bother 'em
+DOMAIN_STOP_LIST = [
+    'varlamov.ru',
+]
+
+
+def _timestamp_to_dttm(timestamp: int, dttm_format: str = DTTM_FORMAT) -> str:
+
+    return datetime.strftime(datetime.fromtimestamp(timestamp), dttm_format)
+
+
+def _requests_session() -> Session:
+    """
+    need more flexible retry policy
+    https://stackoverflow.com/questions/15431044/can-i-set-max-retries-for-requests-request
+    """
+
+    retry_strategy = Retry(
+        total=1,
+        backoff_factor=0.1,
+        backoff_max=5,
+        respect_retry_after_header=False,
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session = Session()
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+
+    return session
 
 
 def _is_cloud_execution() -> bool:
@@ -229,9 +267,9 @@ def download_object_from_s3(bucket: str, file_name: str) -> BytesIO:
     return temp_file
 
 
-def read_local_file(file_name: str) -> str:
+def read_local_file(file_name: str, mode: str = 'r') -> tp.Union[str, bytes]:
 
-    with open(file_name) as f:
+    with open(file_name, mode) as f:
         return f.read()
 
 
@@ -249,10 +287,85 @@ def csv_file_content_to_dict(file_content: str) -> list[dict[str: str]]:
     return [row for row in csv.DictReader(file_content.splitlines())]
 
 
-def write_object_to_local_file(file_name: str, data_obj: bytes):
+def write_object_to_local_file(file_name: str, data_obj: bytes) -> None:
 
     with open(file_name, 'wb') as f:
         f.write(data_obj)
+
+
+def write_list_of_dicts_to_local_csv_file(file_name: str, csv_dict: list[dict[str: str]]) -> None:
+    """csv library works with string objs, so workflow to be slightly changed"""
+
+    with open(file_name, 'w', newline='') as f:
+        writer = csv.DictWriter(f, csv_dict[0].keys())
+        writer.writeheader()
+        writer.writerows(csv_dict)
+
+
+def list_of_dicts_to_csv_bytes(tmp_file_name, csv_dict: list[dict[str: str]]) -> bytes:
+    """convert list of dicts to csv entries in byte format"""
+
+    write_list_of_dicts_to_local_csv_file(tmp_file_name, csv_dict)
+    content = read_local_file(tmp_file_name, mode='rb')
+    os.remove(tmp_file_name)
+
+    return content
+
+
+def make_clean_url(url: str) -> str:
+
+    labels = (
+        '?ssr=true',
+        '?utm',
+        '&utm',
+        '?fbclid',
+        '?source',
+    )
+
+    clean_url = url
+    for label in labels:
+        clean_url = clean_url.split(label)[0]
+
+    return clean_url
+
+
+def get_unshorten_url(url: str, session: Session = None) -> str:
+
+    session_instance = session or requests
+    headers = session_instance.head(url, timeout=5).headers
+
+    if 'location' in headers and headers['location'].startswith('http'):
+        return headers['location']
+    else:
+        return url
+
+
+def get_domain_by_url(url: str) -> str:
+
+    return urlparse(url).netloc
+
+
+def get_title_by_url(url: str, session: Session = None) -> tp.Optional[str]:
+
+    if get_domain_by_url(url) in DOMAIN_STOP_LIST:
+        return None
+
+    session_instance = session or requests
+    response = session_instance.get(url, timeout=5)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    title = soup.find('title')
+
+    if title:
+        return (
+            title.text
+            .strip()
+            .replace('\n', ' ')
+            .replace(';', ' ')
+            .replace('&quot', ' ')
+            .replace('\u2028', ' ')
+        )
+    else:
+        return None
 
 
 def execute_postgresql_query(query):
