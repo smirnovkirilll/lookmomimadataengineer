@@ -17,7 +17,8 @@ from loader.common.helpers import (
     csv_file_content_to_dict,
     write_object_to_local_file,
     upload_object_to_s3,
-    execute_postgresql_query,
+    write_list_of_dicts_to_local_csv_file,
+    list_of_dicts_to_csv_bytes,
 )
 
 
@@ -97,10 +98,30 @@ class TableTransfer:
         # TODO
         pass
 
-    def upload_entries_to_csv(self):
-        # TODO
-        """warning: TransformType.TRUNCATE_INSERT only"""
+    def upload_entries_to_csv(self, bucket=None, file_name=None):
+        """warning:
+           - TransformType.TRUNCATE_INSERT only
+           - on s3 uploading, file_name will be used as TMP file (create => upload => remove)
+        """
+
         self._check_entries()
+
+        if bucket:
+            self.target_s3_bucket = bucket
+
+        if file_name:
+            self.target_file_name = file_name
+        if not self.target_file_name:
+            raise Exception(f'No target_file_name provided, cant proceed')
+
+        if self.target_s3_bucket:
+            content = list_of_dicts_to_csv_bytes(self.target_file_name, self.list_of_dicts_entries)
+            upload_object_to_s3(self.target_s3_bucket, self.target_file_name, content)
+            logger.info(f'Uploaded entries as csv to s3: {self.target_s3_bucket=}, {self.target_file_name=}')
+        else:
+            write_list_of_dicts_to_local_csv_file(self.target_file_name, self.list_of_dicts_entries)
+            logger.info(f'Saved entries as csv locally: {self.target_file_name=}')
+
 
     def upload_entries_to_json(self, bucket=None, file_name=None):
         """warning: TransformType.TRUNCATE_INSERT only"""
@@ -131,7 +152,7 @@ class TableTransfer:
 
 
 if __name__ == '__main__':
-    # note: debug only
+    # note: debug only, move curated-list to private/raw/initial_curated_list.py
     logging.basicConfig(level=logging.INFO)
     curated_list = TableTransfer(
         # 1. local-to-local
