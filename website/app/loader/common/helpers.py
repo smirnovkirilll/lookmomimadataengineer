@@ -28,15 +28,20 @@ s3_client = None
 docapi_table = None
 ymq_queue = None
 DTTM_FORMAT = '%Y-%m-%d %H:%M:%S'
-# some authors do not want me to know titles of their articles, will not bother 'em
-DOMAIN_STOP_LIST = [
-    'varlamov.ru',
-]
+HTTP = 'http://'
+HTTPS = 'https://'
+BLACKLISTED_DOMAIN = os.environ['BLACKLISTED_DOMAIN'].split(',')
+BLACKLISTED_URL = os.environ['BLACKLISTED_URL'].split(',')
 
 
 def _timestamp_to_dttm(timestamp: int, dttm_format: str = DTTM_FORMAT) -> str:
 
     return datetime.strftime(datetime.fromtimestamp(timestamp), dttm_format)
+
+
+def _date_to_timestamp(date: str, date_format: str) -> int:
+
+    return int(datetime.strptime(date, date_format).timestamp())
 
 
 def _requests_session() -> Session:
@@ -320,6 +325,9 @@ def make_clean_url(url: str) -> str:
         '&utm',
         '?fbclid',
         '?source',
+        '?fb_ref',
+        '?fb_action_ids',
+        '?fb_action_types',
     )
 
     clean_url = url
@@ -329,7 +337,31 @@ def make_clean_url(url: str) -> str:
     return clean_url
 
 
-def get_unshorten_url(url: str, session: Session = None) -> str:
+def get_domain_by_url(url: str) -> str:
+
+    return urlparse(url).netloc
+
+
+def is_correct_url(url: str) -> bool:
+
+    return bool(get_domain_by_url(url))
+
+
+def secure_url(url: str) -> str:
+
+    if url.startswith(HTTPS):
+        return url
+    elif url.startswith(HTTP):
+        return HTTPS + url.split(HTTP)[1]
+    else:
+        raise ValueError(f'Incorrect form of {url=}')
+
+
+def get_unshorten_url(url: str, session: Session = None) -> tp.Optional[str]:
+    """potentially time spending func"""
+
+    if get_domain_by_url(url) in BLACKLISTED_DOMAIN or url in BLACKLISTED_URL:
+        return None
 
     session_instance = session or requests
     headers = session_instance.head(url, timeout=5).headers
@@ -340,14 +372,10 @@ def get_unshorten_url(url: str, session: Session = None) -> str:
         return url
 
 
-def get_domain_by_url(url: str) -> str:
-
-    return urlparse(url).netloc
-
-
 def get_title_by_url(url: str, session: Session = None) -> tp.Optional[str]:
+    """potentially time spending func"""
 
-    if get_domain_by_url(url) in DOMAIN_STOP_LIST:
+    if get_domain_by_url(url) in BLACKLISTED_DOMAIN or url in BLACKLISTED_URL:
         return None
 
     session_instance = session or requests

@@ -58,10 +58,14 @@ class TableTransfer:
         self.postgresql_connection = get_postgresql_connection()
         self.s3_client = get_s3_client()
 
-    def _check_entries(self):
+    def _check_entries(self, filter_empty: bool = True):
         """all upload methods should work only if entries has already been prepared"""
+
         if not self.list_of_dicts_entries:
             raise Exception('Get entries at first, cant proceed')
+
+        if filter_empty:
+            self.list_of_dicts_entries = [entry for entry in self.list_of_dicts_entries if entry]
 
     def get_entries_from_csv(self, bucket=None, file_name=None):
         """gets entries from s3 or from local file system if no bucket provided"""
@@ -121,7 +125,6 @@ class TableTransfer:
         else:
             write_list_of_dicts_to_local_csv_file(self.target_file_name, self.list_of_dicts_entries)
             logger.info(f'Saved entries as csv locally: {self.target_file_name=}')
-
 
     def upload_entries_to_json(self, bucket=None, file_name=None):
         """warning: TransformType.TRUNCATE_INSERT only"""
