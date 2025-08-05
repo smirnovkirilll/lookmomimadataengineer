@@ -12,7 +12,7 @@ import typing as tp
 import yandexcloud
 from bs4 import BeautifulSoup
 from datetime import datetime
-from io import BytesIO
+from io import BytesIO, StringIO
 from requests import Session
 from requests.adapters import HTTPAdapter
 from urllib.parse import urlparse
@@ -172,10 +172,11 @@ def get_postgresql_connection():
         connection_data['sslmode'] = os.environ['POSTGRESQL_SSLMODE'],
         connection_data['target_session_attrs'] = os.environ['POSTGRESQL_TARGET_SESSION_ATTRS']
         connection = psycopg2.connect(**connection_data)
-        logger.info(f'Built boto-session for {secret_id=}')
+        logger.info(f'Built postgresql connection for {secret_id=}')
         return connection
-
-    return None
+    else:
+        logger.info(f'Cant build postgresql connection, {secret_id=}')
+        return None
 
 
 def get_boto_session():
@@ -396,7 +397,7 @@ def get_title_by_url(url: str, session: Session = None) -> tp.Optional[str]:
         return None
 
 
-def execute_postgresql_query(query):
+def execute_postgresql_query(query: str):
 
     connection = get_postgresql_connection()
     if connection:
@@ -404,5 +405,17 @@ def execute_postgresql_query(query):
         logger.info(f'Starting execute {query=}')
         cursor.execute(query)
         return cursor.fetchall()
+
+    raise Exception('Cant execute any query, no connection provided')
+
+
+def execute_postgresql_copy_expert(query: str, file: StringIO) -> None:
+
+    connection = get_postgresql_connection()
+    if connection:
+        cursor = connection.cursor()
+        logger.info(f'Starting execute copy_expert {query=}')
+        cursor.copy_expert(query, file)
+        logger.info(f'Finished execute copy_expert {query=}')
 
     raise Exception('Cant execute any query, no connection provided')

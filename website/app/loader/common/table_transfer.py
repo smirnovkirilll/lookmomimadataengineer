@@ -45,7 +45,6 @@ class TableTransfer:
             target_pg_schema=None,
             target_pg_table=None,
     ):
-        self.columns = None
         self.list_of_dicts_entries = None
         self.source_s3_bucket = source_s3_bucket
         self.source_file_name = source_file_name
@@ -67,7 +66,17 @@ class TableTransfer:
         if filter_empty:
             self.list_of_dicts_entries = [entry for entry in self.list_of_dicts_entries if entry]
 
-    def get_entries_from_csv(self, bucket=None, file_name=None):
+    @property
+    def list_of_dicts_entries_b(self):
+        """list_of_dicts_entries as bytes"""
+        self._check_entries()
+        return json.dumps(self.list_of_dicts_entries, indent=2).encode('utf-8')
+
+    @property
+    def header(self):
+        return self.list_of_dicts_entries[0].keys()
+
+    def _get_entries_from_csv_or_json(self, bucket=None, file_name=None, source_type=None):
         """gets entries from s3 or from local file system if no bucket provided"""
 
         if bucket:
@@ -87,16 +96,20 @@ class TableTransfer:
         self.list_of_dicts_entries = csv_file_content_to_dict(content)
         logger.info(f'Got entries as dicts from CSV: {self.list_of_dicts_entries=}')
 
-    @property
-    def list_of_dicts_entries_b(self):
-        """list_of_dicts_entries as bytes"""
-        self._check_entries()
-        return json.dumps(self.list_of_dicts_entries, indent=2).encode('utf-8')
+        if source_type == 'CSV':
+            self.list_of_dicts_entries = csv_file_content_to_dict(content)
+            logger.info(f'Got entries as dicts from CSV: {self.list_of_dicts_entries=}')
+        elif source_type == 'JSON':
+            self.list_of_dicts_entries = json.loads(content)
+            logger.info(f'Got entries as dicts from JSON: {self.list_of_dicts_entries=}')
+        else:
+            raise ValueError(f'Unexpected {source_type=}, CSV/JSON to be used, cant proceed')
+
+    def get_entries_from_csv(self, bucket=None, file_name=None):
+        self._get_entries_from_csv_or_json(bucket=bucket, file_name=file_name, source_type='CSV')
 
     def get_entries_from_json(self, bucket=None, file_name=None):
-        """gets entries from s3 or from local file system if no bucket provided"""
-        # TODO
-        pass
+        self._get_entries_from_csv_or_json(bucket=bucket, file_name=file_name, source_type='JSON')
 
     def get_entries_from_pg(self):
         # TODO
@@ -158,20 +171,26 @@ if __name__ == '__main__':
     # note: debug only, move curated-list to private/raw/initial_curated_list.py
     logging.basicConfig(level=logging.INFO)
     curated_list = TableTransfer(
-        # 1. local-to-local
-        # source_file_name=os.environ['LOCAL_SOURCE_FILE_NAME_CSV'],
+        # 1. local-csv-to-local-json
+        # source_file_name=os.environ['LOCAL_TARGET_FILE_NAME_CSV'],
         # target_file_name=os.environ['LOCAL_TARGET_FILE_NAME_JSON'],
 
-        # 2. local-to-s3
-        source_file_name=os.environ['LOCAL_SOURCE_FILE_NAME_CSV'],
-        target_s3_bucket=os.environ['S3_BUCKET_LOOKMOM'],
-        target_file_name=os.environ['S3_TARGET_FILE_NAME_JSON'],
+        # 2. local-csv-to-s3-json
+        # source_file_name=os.environ['LOCAL_SOURCE_FILE_NAME_CSV'],
+        # target_s3_bucket=os.environ['S3_BUCKET_LOOKMOM'],
+        # target_file_name=os.environ['S3_TARGET_FILE_NAME_JSON'],
 
-        # 3. s3-to-s3
+        # 3. s3-csv-to-s3-json
         # source_s3_bucket=os.environ['S3_BUCKET_LOOKMOM'],
         # source_file_name=os.environ['S3_SOURCE_FILE_NAME_CSV'],
         # target_s3_bucket=os.environ['S3_BUCKET_LOOKMOM'],
         # target_file_name=os.environ['S3_TARGET_FILE_NAME_JSON'],
+
+        # 4. s3-json-to-local-csv
+        # source_s3_bucket=os.environ['S3_BUCKET_LOOKMOM'],
+        # source_file_name=os.environ['S3_TARGET_FILE_NAME_JSON'],
+        # target_file_name=os.environ['LOCAL_TARGET_FILE_NAME_CSV_2'],
     )
-    curated_list.get_entries_from_csv()
-    curated_list.upload_entries_to_json()
+
+    # curated_list.get_entries_from_json()
+    # curated_list.upload_entries_to_csv()
