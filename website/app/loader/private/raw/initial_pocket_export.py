@@ -4,7 +4,6 @@
 
 
 import logging
-import os
 import threading
 from bs4.builder import ParserRejectedMarkup
 from requests import Session
@@ -343,3 +342,6 @@ if __name__ == '__main__':
     # TODO:
     #   upload_pocket_export_to_postgresql() (cloud)
     #   upload_pocket_export_old_to_postgresql() (cloud)
+    # https://www.psycopg.org/docs/cursor.html#cursor.copy_expert
+    # https://www.postgresql.org/docs/current/sql-copy.html
+    # https://stackoverflow.com/questions/44672524/how-to-create-in-memory-file-object
