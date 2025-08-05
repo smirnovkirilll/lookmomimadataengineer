@@ -220,11 +220,11 @@ def fix_pocket_old_row(
     # 2. fix status
     status_renaming_map = {
         'ок': 'archive',
-        # idempotency hack
-        'archive': 'archive',
     }
     cur_status = fixed_row['status']
-    if cur_status in status_renaming_map:
+    if cur_status in status_renaming_map.values():
+        pass
+    elif cur_status in status_renaming_map:
         fixed_row['status'] = status_renaming_map[cur_status]
     else:
         fixed_row['status'] = 'unread'
@@ -240,19 +240,11 @@ def fix_pocket_old_row(
         'техника': 'tech',
         'финансы': 'finance',
         'экономика': 'economics',
-        # idempotency hack
-        'business': 'business',
-        'IT': 'IT',
-        'society': 'society',
-        'selection': 'selection',
-        'software': 'software',
-        'psychology': 'psychology',
-        'tech': 'tech',
-        'finance': 'finance',
-        'economics': 'economics',
     }
     cur_tags = fixed_row['tags']
-    if cur_tags in tags_renaming_map:
+    if cur_tags in tags_renaming_map.values():
+        pass
+    elif cur_tags in tags_renaming_map:
         fixed_row['tags'] = tags_renaming_map[cur_tags]
     else:
         fixed_row['tags'] = None
@@ -340,15 +332,14 @@ if __name__ == '__main__':
     #     target_s3_file_name=os.environ['S3_POCKET_EXPORT_TARGET_FILE_NAME_CSV'],
     # )
 
-    enrich_pocket_export(
-        source_file_name=os.environ['LOCAL_POCKET_EXPORT_OLD_SOURCE_FILE_NAME_CSV'],
-        target_file_name=os.environ['LOCAL_POCKET_EXPORT_OLD_TARGET_FILE_NAME_CSV'],
-        target_s3_bucket=os.environ['S3_BUCKET_PRIVATE_DATA_PROCESSING'],
-        target_s3_file_name=os.environ['S3_POCKET_EXPORT_OLD_TARGET_FILE_NAME_CSV'],
-        fix_pocket_old=True,
-    )
+    # enrich_pocket_export(
+    #     source_file_name=os.environ['LOCAL_POCKET_EXPORT_OLD_SOURCE_FILE_NAME_CSV'],
+    #     target_file_name=os.environ['LOCAL_POCKET_EXPORT_OLD_TARGET_FILE_NAME_CSV'],
+    #     target_s3_bucket=os.environ['S3_BUCKET_PRIVATE_DATA_PROCESSING'],
+    #     target_s3_file_name=os.environ['S3_POCKET_EXPORT_OLD_TARGET_FILE_NAME_CSV'],
+    #     fix_pocket_old=True,
+    # )
 
     # TODO:
-    #   enrich_pocket_export_old()
     #   upload_pocket_export_to_postgresql() (cloud)
     #   upload_pocket_export_old_to_postgresql() (cloud)
