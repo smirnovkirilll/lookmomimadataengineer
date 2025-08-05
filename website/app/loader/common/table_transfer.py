@@ -4,22 +4,9 @@
 #   lets implement generic transfer to move entries in any direction
 
 import json
-import os
 import logging
-import typing as tp
 from enum import Enum
-from loader.common.helpers import (
-    get_postgresql_connection,
-    get_s3_client,
-    download_object_from_s3,
-    read_local_file,
-    read_temp_file,
-    csv_file_content_to_dict,
-    write_object_to_local_file,
-    upload_object_to_s3,
-    write_list_of_dicts_to_local_csv_file,
-    list_of_dicts_to_csv_bytes,
-)
+from loader.common import helpers
 
 
 logger = logging.getLogger('logging table_transfer')
@@ -54,8 +41,7 @@ class TableTransfer:
         self.source_pg_table = source_pg_table
         self.target_pg_schema = target_pg_schema
         self.target_pg_table = target_pg_table
-        self.postgresql_connection = get_postgresql_connection()
-        self.s3_client = get_s3_client()
+        self.s3_client = helpers.get_s3_client()
 
     def _check_entries(self, filter_empty: bool = True):
         """all upload methods should work only if entries has already been prepared"""
@@ -69,6 +55,7 @@ class TableTransfer:
     @property
     def list_of_dicts_entries_b(self):
         """list_of_dicts_entries as bytes"""
+
         self._check_entries()
         return json.dumps(self.list_of_dicts_entries, indent=2).encode('utf-8')
 
@@ -88,16 +75,16 @@ class TableTransfer:
             raise Exception(f'No source_file_name provided, cant proceed')
 
         if self.source_s3_bucket:
-            temp_file = download_object_from_s3(self.source_s3_bucket, self.source_file_name)
-            content = read_temp_file(temp_file)
+            temp_file = helpers.download_object_from_s3(self.source_s3_bucket, self.source_file_name)
+            content = helpers.read_temp_file(temp_file)
         else:
-            content = read_local_file(self.source_file_name)
+            content = helpers.read_local_file(self.source_file_name)
 
-        self.list_of_dicts_entries = csv_file_content_to_dict(content)
+        self.list_of_dicts_entries = helpers.csv_file_content_to_dict(content)
         logger.info(f'Got entries as dicts from CSV: {self.list_of_dicts_entries=}')
 
         if source_type == 'CSV':
-            self.list_of_dicts_entries = csv_file_content_to_dict(content)
+            self.list_of_dicts_entries = helpers.csv_file_content_to_dict(content)
             logger.info(f'Got entries as dicts from CSV: {self.list_of_dicts_entries=}')
         elif source_type == 'JSON':
             self.list_of_dicts_entries = json.loads(content)
@@ -118,7 +105,7 @@ class TableTransfer:
     def upload_entries_to_csv(self, bucket=None, file_name=None):
         """warning:
            - TransformType.TRUNCATE_INSERT only
-           - on s3 uploading, file_name will be used as TMP file (create => upload => remove)
+           - on s3 uploading, file_name if provided will be used as TMP file (create => upload => remove)
         """
 
         self._check_entries()
@@ -132,15 +119,16 @@ class TableTransfer:
             raise Exception(f'No target_file_name provided, cant proceed')
 
         if self.target_s3_bucket:
-            content = list_of_dicts_to_csv_bytes(self.target_file_name, self.list_of_dicts_entries)
-            upload_object_to_s3(self.target_s3_bucket, self.target_file_name, content)
+            content = helpers.list_of_dicts_to_csv_bytes(csv_dict=self.list_of_dicts_entries)
+            helpers.upload_object_to_s3(self.target_s3_bucket, self.target_file_name, content)
             logger.info(f'Uploaded entries as csv to s3: {self.target_s3_bucket=}, {self.target_file_name=}')
         else:
-            write_list_of_dicts_to_local_csv_file(self.target_file_name, self.list_of_dicts_entries)
+            helpers.write_list_of_dicts_to_local_csv_file(self.target_file_name, self.list_of_dicts_entries)
             logger.info(f'Saved entries as csv locally: {self.target_file_name=}')
 
     def upload_entries_to_json(self, bucket=None, file_name=None):
         """warning: TransformType.TRUNCATE_INSERT only"""
+
         self._check_entries()
 
         if bucket:
@@ -152,19 +140,29 @@ class TableTransfer:
             raise Exception(f'No target_file_name provided, cant proceed')
 
         if self.target_s3_bucket:
-            upload_object_to_s3(self.target_s3_bucket, self.target_file_name, self.list_of_dicts_entries_b)
+            helpers.upload_object_to_s3(self.target_s3_bucket, self.target_file_name, self.list_of_dicts_entries_b)
             logger.info(f'Uploaded entries as json to s3: {self.target_s3_bucket=}, {self.target_file_name=}')
         else:
-            write_object_to_local_file(self.target_file_name, self.list_of_dicts_entries_b)
+            helpers.write_object_to_local_file(self.target_file_name, self.list_of_dicts_entries_b)
             logger.info(f'Saved entries as json locally: {self.target_file_name=}')
 
-    def upload_entries_to_pg(self, transform_type: TransformType):
+    def upload_entries_to_pg(self, transform_type: TransformType = TransformType.INSERT):
         """insert/upsert/truncate+insert"""
-        # TODO
 
         self._check_entries()
-        if not self.postgresql_connection:
-            raise Exception('No postgresql_connection provided, cant proceed')
+
+        if transform_type == TransformType.UPSERT:
+            raise NotImplemented('TBD: different way of copy to be implemented')
+        elif transform_type == TransformType.TRUNCATE_INSERT:
+            helpers.execute_postgresql_truncate_table(
+                schema=self.target_pg_schema,
+                table=self.target_pg_table,
+            )
+        helpers.execute_postgresql_copy_from(
+            schema=self.target_pg_schema,
+            table=self.target_pg_table,
+            file_content=helpers.list_of_dicts_to_csv_bytes(self.list_of_dicts_entries),
+        )
 
 
 if __name__ == '__main__':

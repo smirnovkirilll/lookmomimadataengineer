@@ -12,7 +12,7 @@ import typing as tp
 import yandexcloud
 from bs4 import BeautifulSoup
 from datetime import datetime
-from io import BytesIO, StringIO
+from io import BytesIO
 from requests import Session
 from requests.adapters import HTTPAdapter
 from urllib.parse import urlparse
@@ -32,6 +32,7 @@ HTTP = 'http://'
 HTTPS = 'https://'
 BLACKLISTED_DOMAIN = os.environ['BLACKLISTED_DOMAIN'].split(',')
 BLACKLISTED_URL = os.environ['BLACKLISTED_URL'].split(',')
+TEMP_FILE_NAME = os.environ['TEMP_FILE_NAME']
 
 
 def _timestamp_to_dttm(timestamp: int, dttm_format: str = DTTM_FORMAT) -> str:
@@ -163,7 +164,8 @@ def get_postgresql_secrets() -> dict:
         return _get_environ_postgresql_secrets()
 
 
-def get_postgresql_connection():
+def _get_postgresql_connection():
+    """for production and development usage"""
 
     connection_data = get_postgresql_secrets()
     secret_id = connection_data.pop('secret_id')
@@ -177,6 +179,15 @@ def get_postgresql_connection():
     else:
         logger.info(f'Cant build postgresql connection, {secret_id=}')
         return None
+
+
+def get_postgresql_connection():
+    """for production usage only"""
+
+    connection = _get_postgresql_connection()
+    if not connection:
+        raise Exception('No postgresql_connection provided, cant proceed')
+    return connection
 
 
 def get_boto_session():
@@ -308,12 +319,15 @@ def write_list_of_dicts_to_local_csv_file(file_name: str, csv_dict: list[dict[st
         writer.writerows(csv_dict)
 
 
-def list_of_dicts_to_csv_bytes(tmp_file_name, csv_dict: list[dict[str: str]]) -> bytes:
+def list_of_dicts_to_csv_bytes(
+        csv_dict: list[dict[str: str]],
+        temp_file_name: str = TEMP_FILE_NAME,
+) -> bytes:
     """convert list of dicts to csv entries in byte format"""
 
-    write_list_of_dicts_to_local_csv_file(tmp_file_name, csv_dict)
-    content = read_local_file(tmp_file_name, mode='rb')
-    os.remove(tmp_file_name)
+    write_list_of_dicts_to_local_csv_file(temp_file_name, csv_dict)
+    content = read_local_file(temp_file_name, mode='rb')
+    os.remove(temp_file_name)
 
     return content
 
@@ -409,7 +423,7 @@ def execute_postgresql_query(query: str):
     raise Exception('Cant execute any query, no connection provided')
 
 
-def execute_postgresql_copy_expert(query: str, file: StringIO) -> None:
+def execute_postgresql_copy_expert(query: str, file: BytesIO) -> None:
 
     connection = get_postgresql_connection()
     if connection:
@@ -419,3 +433,15 @@ def execute_postgresql_copy_expert(query: str, file: StringIO) -> None:
         logger.info(f'Finished execute copy_expert {query=}')
 
     raise Exception('Cant execute any query, no connection provided')
+
+
+def execute_postgresql_copy_from(schema: str, table: str, file_content: bytes) -> None:
+
+    query = f"""COPY `{schema}`.`{table}` FROM STDIN WITH CSV HEADER;"""
+    execute_postgresql_copy_expert(query, BytesIO(file_content))
+
+
+def execute_postgresql_truncate_table(schema: str, table: str):
+
+    query = f"""TRUNCATE `{schema}`.`{table}`;"""
+    execute_postgresql_query(query)
