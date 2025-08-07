@@ -14,7 +14,7 @@ import requests
 import requests.auth
 import time
 from datetime import datetime
-from loader.common.helpers import upload_object_to_s3
+from table_transfer.helpers import upload_object_to_s3
 
 
 SUBREDDIT = 'dataengineering'

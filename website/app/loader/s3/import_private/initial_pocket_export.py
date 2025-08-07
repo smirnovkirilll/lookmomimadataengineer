@@ -1,30 +1,31 @@
 #!/bin/env python
 # note: given export CSV file https://support.mozilla.org/en-US/kb/exporting-your-pocket-list
-#   enrich those entries with additional info (locally) and store result to s3 and postgresql DB
+#   enrich those entries with additional info (locally) and store result to s3 (and postgresql DB - other script)
 
 
 import logging
+import os
 import threading
 from bs4.builder import ParserRejectedMarkup
 from requests import Session
 from requests.exceptions import ConnectionError, MissingSchema
 from urllib3.exceptions import MaxRetryError, NewConnectionError, NameResolutionError
 
-from loader.common.helpers import (
+from table_transfer import (
     is_correct_url,
     secure_url,
     get_domain_by_url,
     get_title_by_url,
     get_unshorten_url,
     make_clean_url,
-    _date_to_timestamp,
-    _requests_session,
-    _timestamp_to_dttm,
+    date_to_timestamp,
+    requests_session,
+    timestamp_to_dttm,
+    TableTransfer,
 )
-from loader.common.table_transfer import TableTransfer
 
 
-logger = logging.getLogger('logging pocket_export')
+logger = logging.getLogger('logging initial_pocket_export')
 logger.setLevel(logging.INFO)
 
 
@@ -98,7 +99,7 @@ def enrich_row(
                 'unshorten_url': unshorten_url,
                 'domain_url': get_domain_by_url(unshorten_url),
                 'clean_title': clean_title,
-                'utc_added_dttm': _timestamp_to_dttm(int(row['time_added'])),
+                'utc_added_dttm': timestamp_to_dttm(int(row['time_added'])),
 
                 'processing_status': 'PROCESSED',
                 'errors': errors,
@@ -120,7 +121,7 @@ def enrich_row(
                 'unshorten_url': unshorten_url,
                 'domain_url': get_domain_by_url(unshorten_url),
                 'clean_title': clean_title,
-                'utc_added_dttm': _timestamp_to_dttm(int(row['time_added'])),
+                'utc_added_dttm': timestamp_to_dttm(int(row['time_added'])),
 
                 'processing_status': 'PROCESSED',
                 'errors': errors,
@@ -142,7 +143,7 @@ def enrich_group_of_rows(
 
     threads = []
     enriched_rows = []
-    session = _requests_session()
+    session = requests_session()
 
     if multi_threading:
         for row in list_of_rows:
@@ -252,11 +253,11 @@ def fix_pocket_old_row(
     cur_date_added = fixed_row['date_added'] or '01.01.1970'
     if '/' in cur_date_added:
         try:
-            fixed_row['time_added'] = _date_to_timestamp(cur_date_added, '%d/%m/%Y')
+            fixed_row['time_added'] = date_to_timestamp(cur_date_added, '%d/%m/%Y')
         except ValueError:
-            fixed_row['time_added'] = _date_to_timestamp(cur_date_added, '%m/%d/%Y')
+            fixed_row['time_added'] = date_to_timestamp(cur_date_added, '%m/%d/%Y')
     else:
-        fixed_row['time_added'] = _date_to_timestamp(cur_date_added, '%d.%m.%Y')
+        fixed_row['time_added'] = date_to_timestamp(cur_date_added, '%d.%m.%Y')
 
     return fixed_row
 
@@ -321,25 +322,25 @@ def enrich_pocket_export(
 
 
 if __name__ == '__main__':
-    # note: initial script, once time usage
     logging.basicConfig(level=logging.INFO)
 
-    # enrich_pocket_export(
-    #     source_file_name=os.environ['LOCAL_POCKET_EXPORT_SOURCE_FILE_NAME_CSV'],
-    #     target_file_name=os.environ['LOCAL_POCKET_EXPORT_TARGET_FILE_NAME_CSV'],
-    #     target_s3_bucket=os.environ['S3_BUCKET_PRIVATE_DATA_PROCESSING'],
-    #     target_s3_file_name=os.environ['S3_POCKET_EXPORT_TARGET_FILE_NAME_CSV'],
-    # )
+    enrich_pocket_export(
+        source_file_name=os.environ['LOCAL_POCKET_EXPORT_SOURCE_FILE_NAME_CSV'],
+        target_file_name=os.environ['LOCAL_POCKET_EXPORT_TARGET_FILE_NAME_CSV'],
+        target_s3_bucket=os.environ['S3_BUCKET_PRIVATE_DATA_PROCESSING'],
+        target_s3_file_name=os.environ['S3_POCKET_EXPORT_TARGET_FILE_NAME_CSV'],
+    )
 
-    # enrich_pocket_export(
-    #     source_file_name=os.environ['LOCAL_POCKET_EXPORT_OLD_SOURCE_FILE_NAME_CSV'],
-    #     target_file_name=os.environ['LOCAL_POCKET_EXPORT_OLD_TARGET_FILE_NAME_CSV'],
-    #     target_s3_bucket=os.environ['S3_BUCKET_PRIVATE_DATA_PROCESSING'],
-    #     target_s3_file_name=os.environ['S3_POCKET_EXPORT_OLD_TARGET_FILE_NAME_CSV'],
-    #     fix_pocket_old=True,
-    # )
+    enrich_pocket_export(
+        source_file_name=os.environ['LOCAL_POCKET_EXPORT_OLD_SOURCE_FILE_NAME_CSV'],
+        target_file_name=os.environ['LOCAL_POCKET_EXPORT_OLD_TARGET_FILE_NAME_CSV'],
+        target_s3_bucket=os.environ['S3_BUCKET_PRIVATE_DATA_PROCESSING'],
+        target_s3_file_name=os.environ['S3_POCKET_EXPORT_OLD_TARGET_FILE_NAME_CSV'],
+        fix_pocket_old=True,
+    )
 
     # TODO:
+    #   fix os.environ names, move PG part to dedicated package
     #   upload_pocket_export_to_postgresql() (cloud)
     #   upload_pocket_export_old_to_postgresql() (cloud)
     # https://www.psycopg.org/docs/cursor.html#cursor.copy_expert

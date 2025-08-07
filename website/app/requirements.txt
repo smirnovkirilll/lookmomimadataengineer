@@ -1,3 +1,1 @@
-boto3
-psycopg2-binary
-yandexcloud
+table_transfer @ git+https://github.com/smirnovkirilll/table_transfer.git
