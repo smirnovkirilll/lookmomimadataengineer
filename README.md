@@ -50,7 +50,8 @@ Hello everyone! My name is Kirill, [I'm a data engineer](https://www.linkedin.co
 
 
 &nbsp;
-### [list itself](https://lookmomimadataengineer.website.yandexcloud.net/)
+> [!IMPORTANT]
+> # [list itself](https://lookmomimadataengineer.website.yandexcloud.net/)
 
 
 &nbsp;

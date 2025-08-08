@@ -1,1 +1,1 @@
-table_transfer @ git+https://github.com/smirnovkirilll/table_transfer.git
+table_transfer @ git+https://github.com/smirnovkirilll/micro_dwh.git
