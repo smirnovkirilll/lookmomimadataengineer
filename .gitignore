@@ -1,14 +1,5 @@
 .idea
 .DS_Store
-__pycache__
 ag-grid-community.min.js
 README.html
-website/data
-terraform/state_and_vars/
 *draft*
-*key.json
-*key.yaml
-*secret*
-**/terraform.tfstate*
-**/.terraform*
-*.tfvars
