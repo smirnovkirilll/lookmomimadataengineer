@@ -2,7 +2,6 @@
 .DS_Store
 __pycache__
 ag-grid-community.min.js
-data_flow_map.html
 README.html
 website/data
 terraform/state_and_vars/
