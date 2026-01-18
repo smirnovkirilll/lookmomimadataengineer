@@ -27,7 +27,7 @@ const gridOptionsCL = {
       cellRenderer: TitleCellLinkRendererCL,
       minWidth: 500,
       maxWidth: 600,
-      tooltipField: "title",
+      tooltipValueGetter: params => params.value,
     },
     { field: "topic" },
     { field: "type of content" },
@@ -56,15 +56,12 @@ function onFilterTextBoxChangedCL() {
 
 
 function TitleCellLinkRendererCL(params) {
-  let title = params.value;
-  let url = params.data.url;
-  let link = `
-    <a
-      href="${url}"
-    >
-    ${title}
-  </a>`;
-  return link;
+  const a = document.createElement("a");
+  a.textContent = "link";
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.href = `${params.data.url}`;
+  return a;
 }
 
 
