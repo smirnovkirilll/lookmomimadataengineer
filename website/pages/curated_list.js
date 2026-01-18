@@ -57,7 +57,7 @@ function onFilterTextBoxChangedCL() {
 
 function TitleCellLinkRendererCL(params) {
   const a = document.createElement("a");
-  a.textContent = "link";
+  a.textContent = params.value;
   a.target = "_blank";
   a.rel = "noopener noreferrer";
   a.href = `${params.data.url}`;
