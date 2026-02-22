@@ -1,11 +1,13 @@
-let gridApiCL;
-const gridOptionsCL = {
+let gridApi__1;
+const gridOptions__1 = {
   rowData: [],
   getRowId: params => params.data.title,
   autoSizeStrategy: {type: "fitCellContents"},
   tooltipShowMode: "whenTruncated",
   tooltipShowDelay: 1000,
   pagination: true,
+  paginationPageSize: 1000,
+  paginationPageSizeSelector: false,
   enableCellTextSelection: true,
   defaultColDef: {filter: true},
   rowClassRules: {
@@ -24,7 +26,7 @@ const gridOptionsCL = {
     },
     {
       field: "title",
-      cellRenderer: TitleCellLinkRendererCL,
+      cellRenderer: TitleCellLinkRenderer__1,
       minWidth: 500,
       maxWidth: 600,
       tooltipValueGetter: params => params.value,
@@ -47,15 +49,15 @@ const gridOptionsCL = {
 };
 
 
-function onFilterTextBoxChangedCL() {
-  gridApiCL.setGridOption(
+function onFilterTextBoxChanged__1() {
+  gridApi__1.setGridOption(
     "quickFilterText",
-    document.getElementById("curated-list-filter").value,
+    document.getElementById("filter__1").value,
   );
 }
 
 
-function TitleCellLinkRendererCL(params) {
+function TitleCellLinkRenderer__1(params) {
   const a = document.createElement("a");
   a.textContent = params.value;
   a.target = "_blank";
@@ -67,7 +69,7 @@ function TitleCellLinkRendererCL(params) {
 
 document.addEventListener('keydown', function(event) {
   if (event.key === '/') {
-    var filter = document.getElementById('curated-list-filter');
+    var filter = document.getElementById('filter__1');
     filter.setSelectionRange(0, filter.value.length);
     filter.focus();
     event.preventDefault();
@@ -75,7 +77,7 @@ document.addEventListener('keydown', function(event) {
 });
 
 
-gridApiCL = agGrid.createGrid(document.querySelector("#CuratedListGrid"), gridOptionsCL);
+gridApi__1 = agGrid.createGrid(document.querySelector("#Grid__1"), gridOptions__1);
 fetch("data/curated_list.json")
   .then((response) => response.json())
-  .then((data) => gridApiCL.setGridOption("rowData", data));
+  .then((data) => gridApi__1.setGridOption("rowData", data));
