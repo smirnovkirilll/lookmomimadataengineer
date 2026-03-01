@@ -1,15 +1,13 @@
+import {
+  titleLinkRenderer,
+  applyQuickFilter,
+  createBaseGridOptions,
+} from "../common/utils.js";
+
+
 let gridApi__1;
 const gridOptions__1 = {
-  rowData: [],
-  getRowId: params => params.data.title,
-  autoSizeStrategy: {type: "fitCellContents"},
-  tooltipShowMode: "whenTruncated",
-  tooltipShowDelay: 1000,
-  pagination: true,
-  paginationPageSize: 1000,
-  paginationPageSizeSelector: false,
-  enableCellTextSelection: true,
-  defaultColDef: {filter: true},
+  ...createBaseGridOptions(),
   rowClassRules: {
     "row-background-grey": "data.comment == 'FRIN'",
   },
@@ -24,7 +22,7 @@ const gridOptions__1 = {
     },
     {
       field: "title",
-      cellRenderer: TitleCellLinkRenderer__1,
+      cellRenderer: titleLinkRenderer,
       minWidth: 500,
       maxWidth: 600,
       tooltipValueGetter: params => params.value,
@@ -47,24 +45,6 @@ const gridOptions__1 = {
 };
 
 
-function onFilterTextBoxChanged__1() {
-  gridApi__1.setGridOption(
-    "quickFilterText",
-    document.getElementById("filter__1").value,
-  );
-}
-
-
-function TitleCellLinkRenderer__1(params) {
-  const a = document.createElement("a");
-  a.textContent = params.value;
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
-  a.href = params.data.url;
-  return a;
-}
-
-
 document.addEventListener('keydown', function(event) {
   if (event.key === '/') {
     var filter = document.getElementById('filter__1');
@@ -73,6 +53,11 @@ document.addEventListener('keydown', function(event) {
     event.preventDefault();
   }
 });
+
+
+document.getElementById("filter__1").addEventListener("input", () =>
+    applyQuickFilter(gridApi__1, "filter__1")
+  );
 
 
 gridApi__1 = agGrid.createGrid(document.querySelector("#Grid__1"), gridOptions__1);
