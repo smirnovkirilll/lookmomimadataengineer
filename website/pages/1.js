@@ -11,9 +11,7 @@ const gridOptions__1 = {
   enableCellTextSelection: true,
   defaultColDef: {filter: true},
   rowClassRules: {
-    "row-background-grey": "data.background_color == 'GREY'",
-    "row-background-pink": "data.background_color == 'PINK'",
-    "row-background-red": "data.background_color == 'RED'",
+    "row-background-grey": "data.comment == 'FRIN'",
   },
 
   columnDefs: [
@@ -62,7 +60,7 @@ function TitleCellLinkRenderer__1(params) {
   a.textContent = params.value;
   a.target = "_blank";
   a.rel = "noopener noreferrer";
-  a.href = `${params.data.url}`;
+  a.href = params.data.url;
   return a;
 }
 

@@ -73,6 +73,9 @@ h2 {
 .ag-paging-panel {
     font-family: "Helvetica Neue", sans-serif;
 }
+.row-background-grey {background-color: #eee;}
+.row-background-yellow {background-color: #fff8dc;}
+.row-background-red {background-color: #cc222233;}
 
 
 .footer {
