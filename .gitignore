@@ -37,3 +37,6 @@ secret*.tfvars
 # ── drafts and local scratch that never gets committed ────────
 *_NOGIT
 *.bak
+
+# ── project-specific ──────────────────────────────────────────
+website/data/
