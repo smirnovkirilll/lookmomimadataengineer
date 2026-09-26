@@ -7,28 +7,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- AG-GRID -->
-    <link rel="stylesheet" href="common/additional.css" />
-    <script type="text/javascript" src="common/ag-grid-community.min.js"></script>
+    <link rel="stylesheet" href="gridkit/additional.css" />
+    <script type="text/javascript" src="gridkit/ag-grid-community.min.js"></script>
 </head>
 <body class="body">
 
 
-<!--DYNAMIC PART BEGIN-->
 <h2>Look Mom, I'm a Data Engineer</h2>
 <div class="subtitle">
     Curated must-read/must-watch/must-learn list on Data Landscape (ETL-tools, concepts, etc.)
 </div>
-<div>
-    <input type="text" id="filter__1" class="ag-grid-quick-filter" placeholder="Filter..." />
-</div>
-<div id="Grid__1" class="ag-grid"></div>
-<script type="module" src="pages/1.js"></script>
-<!--DYNAMIC PART END-->
+<div id="page"></div>
+<script type="module" src="pages/curated_list.js"></script>
 
 
 <div class="footer">
     <a href="https://github.com/smirnovkirilll/lookmomimadataengineer">
-    <img src="common/github.png" alt="github" class="footer-img">
+    <img src="gridkit/github.png" alt="github" class="footer-img">
     </a>
 </div>
 

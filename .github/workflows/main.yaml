@@ -14,10 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Sync files to S3
-      # direct exclude with globing does not work properly, so using enumeration of subdirs
       # "when_required" - aws bug https://github.com/aws/aws-cli/issues/9214
       env:
         AWS_ENDPOINT_URL: ${{ secrets.AWS_ENDPOINT_URL }}
@@ -29,8 +28,10 @@ jobs:
         AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
         AG_GRID_CDN_URL: ${{ vars.AG_GRID_CDN_URL }}
         AG_GRID_TARGET_PATH: ${{ vars.AG_GRID_TARGET_PATH }}
+        GRIDKIT_REPO: ${{ vars.GRIDKIT_REPO }}
       run: |
-        aws s3 sync website/common s3://"$AWS_S3_BUCKET"/common --delete;
+        git clone "$GRIDKIT_REPO" /tmp/gridkit;
+        aws s3 sync /tmp/gridkit/src s3://"$AWS_S3_BUCKET"/gridkit --delete;
         aws s3 sync website/pages s3://"$AWS_S3_BUCKET"/pages --delete;
         aws s3 cp website/index.html s3://"$AWS_S3_BUCKET"/index.html;
         curl "$AG_GRID_CDN_URL" | aws s3 cp - s3://"$AWS_S3_BUCKET"/"$AG_GRID_TARGET_PATH";

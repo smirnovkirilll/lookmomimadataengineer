@@ -1,7 +1,7 @@
-import { titleLinkRenderer } from "../common/utils.js";
+import { titleLinkRenderer, initGrid } from "../gridkit/utils.js";
 
 
-export const columns__1 = [
+const columns = [
     {
         headerName: "#",
         valueGetter: params => params.node.rowIndex + 1,
@@ -33,6 +33,22 @@ export const columns__1 = [
 ];
 
 
-export const c_rules__1 = {
+const rowClassRules = {
     "row-background-grey": "data.comment == 'FRIN'",
 };
+
+
+const { filterInput } = initGrid(document.getElementById("page"), {
+    columns,
+    rowClassRules,
+    dataUrl: "data/curated_list.json",
+});
+
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === '/') {
+        filterInput.setSelectionRange(0, filterInput.value.length);
+        filterInput.focus();
+        event.preventDefault();
+    }
+});
