@@ -40,3 +40,4 @@ secret*.tfvars
 
 # ── project-specific ──────────────────────────────────────────
 website/data/
+website/gridkit
